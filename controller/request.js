@@ -1,9 +1,10 @@
 'use strict';
 
-const { MemorialRequest, RequestPhoto } = require('../models');
+const { MemorialRequest, RequestPhoto,Partner } = require('../models');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const bcrypt=require('bcrypt')
 // GET ALL REQUESTS FOR LOGGED IN PARTNER
 const getRequests = async (req, res) => {
   try {
@@ -161,4 +162,114 @@ const createRequest = async (req, res) => {
 };
 
 
-module.exports = { getRequests, getRequest, createRequest, uploadPhotos };
+
+
+
+
+
+const getAccount = async (req, res) => {
+  try {
+    const partner = await Partner.findByPk(req.partner.id, {
+      attributes: ['id', 'username', 'email', 'role', 'createdAt', 'updatedAt'],
+    });
+ 
+    if (!partner) {
+      return res.status(404).json({ message: 'Partner not found.' });
+    }
+ 
+    return res.status(200).json({ partner });
+  } catch (err) {
+    console.error('[getAccount]', err);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+
+
+const updateAccount = async (req, res) => {
+  try {
+    const { username, email } = req.body;
+ 
+    if (!username || !username.trim()) {
+      return res.status(400).json({ message: 'Username is required.' });
+    }
+ 
+    const partner = await Partner.findByPk(req.partner.id);
+    if (!partner) {
+      return res.status(404).json({ message: 'Partner not found.' });
+    }
+ 
+    // Check username uniqueness if it changed
+    if (username.trim() !== partner.username) {
+      const existing = await Partner.findOne({
+        where: { username: username.trim() },
+      });
+      if (existing) {
+        return res.status(409).json({ message: 'That username is already taken.' });
+      }
+    }
+ 
+    // Check email uniqueness if it changed and is provided
+    if (email && email.trim() !== partner.email) {
+      const existingEmail = await Partner.findOne({
+        where: { email: email.trim() },
+      });
+      if (existingEmail) {
+        return res.status(409).json({ message: 'That email address is already in use.' });
+      }
+    }
+ 
+    await partner.update({
+      username: username.trim(),
+      email: email ? email.trim() : null,
+    });
+ 
+    return res.status(200).json({
+      message: 'Profile updated successfully.',
+      partner: {
+        id: partner.id,
+        username: partner.username,
+        email: partner.email,
+        role: partner.role,
+      },
+    });
+  } catch (err) {
+    console.error('[updateAccount]', err);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+
+
+
+const updatePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+ 
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'currentPassword and newPassword are required.' });
+    }
+ 
+    if (newPassword.length < 8) {
+      return res.status(400).json({ message: 'New password must be at least 8 characters.' });
+    }
+ 
+    const partner = await Partner.findByPk(req.partner.id);
+    if (!partner) {
+      return res.status(404).json({ message: 'Partner not found.' });
+    }
+ 
+    const valid = await bcrypt.compare(currentPassword, partner.password);
+    if (!valid) {
+      return res.status(401).json({ message: 'Current password is incorrect.' });
+    }
+ 
+    const hashed = await bcrypt.hash(newPassword, 12);
+    await partner.update({ password: hashed });
+ 
+    return res.status(200).json({ message: 'Password changed successfully.' });
+  } catch (err) {
+    console.error('[updatePassword]', err);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+
+module.exports = { getRequests, getRequest, createRequest, uploadPhotos,getAccount,updateAccount,updatePassword};

@@ -17,10 +17,18 @@ module.exports = (sequelize) => {
       unique: true,
     },
     email: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        unique: true,
-      },
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true,
+    },
+    contactName: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -75,11 +83,32 @@ module.exports = (sequelize) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    adminNotes: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
     status: {
       type: DataTypes.ENUM('pending_approval', 'approved', 'completed', 'denied'),
       allowNull: false,
       defaultValue: 'pending_approval',
     },
+    approvedBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    approvedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    deniedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    deniedBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+  
   }, {
     tableName: 'memorial_requests',
     timestamps: true,

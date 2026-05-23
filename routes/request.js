@@ -4,7 +4,12 @@ const express = require('express');
 const router = express.Router();
 
 const authenticate = require('../middleware/middleware');
-const { getRequests, getRequest, createRequest, uploadPhotos } = require('../controller/request');
+const { getRequests, getRequest, createRequest, uploadPhotos,updateAccount,updatePassword,getAccount } = require('../controller/request');
+router.put('/update-account', authenticate,updateAccount);
+router.put('/password', authenticate,updatePassword)
+
+router.get('/getAccount', authenticate,getAccount);
+
 router.get('/', authenticate, getRequests);
 router.get('/:id', authenticate, getRequest);
 
@@ -27,4 +32,8 @@ router.post(
     createRequest,
   );
 
+
+
+
+ 
 module.exports = router;

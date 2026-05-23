@@ -235,20 +235,57 @@ module.exports = (models) => {
    * Body: { status: 'pending_approval' | 'approved' | 'completed' }
    */
   const updateRequestStatus = safe(async (req, res) => {
-    const { status } = req.body;
+    const { status, adminNotes } = req.body;
     const allowed = ['pending_approval', 'approved', 'completed', 'denied'];
-
+  
     if (!allowed.includes(status))
       return res.status(400).json({ message: `status must be one of: ${allowed.join(', ')}.` });
-
+  
     const request = await MemorialRequest.findByPk(req.params.id);
     if (!request)
       return res.status(404).json({ message: 'Request not found.' });
-
+  
+    // Look up the admin record to get their name
+    const admin = await Partner.findByPk(req.admin.id);
+    if (!admin)
+      return res.status(404).json({ message: 'Admin not found.' });
+  
+    const adminName = admin.contactName || admin.username;
+  
     request.status = status;
+  
+    if (adminNotes !== undefined) request.adminNotes = adminNotes;
+  
+    if (status === 'approved') {
+      request.approvedBy = adminName;
+      request.approvedAt = new Date();
+      // Clear denial fields if re-approving after a denial
+      request.deniedBy = null;
+      request.deniedAt = null;
+    }
+  
+    if (status === 'denied') {
+      request.deniedBy = adminName;
+      request.deniedAt = new Date();
+      // Clear approval fields if denying after an approval
+      request.approvedBy = null;
+      request.approvedAt = null;
+    }
+  
     await request.save();
-
-    res.json({ message: 'Status updated.', request: { id: request.id, status: request.status } });
+  
+    res.json({
+      message: 'Status updated.',
+      request: {
+        id: request.id,
+        status: request.status,
+        adminNotes: request.adminNotes,
+        approvedBy: request.approvedBy,
+        approvedAt: request.approvedAt,
+        deniedBy: request.deniedBy,
+        deniedAt: request.deniedAt,
+      },
+    });
   });
 
   return {
