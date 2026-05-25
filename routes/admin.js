@@ -3,11 +3,17 @@
 const { Router } = require('express');
 const adminAuth = require('../middleware/admin');
 
+const { MemorialRequest, RequestPhoto,Partner } = require('../models');
 module.exports = (models) => {
   const router = Router();
   const controller = require('../controller/admin')(models); // ← pass models here
 
+ 
   // Public
+  router.get('/requests/:id/documents', async (req, res) => {
+    const docs = await RequestPhoto.findAll({ where: { requestId: req.params.id } });
+    res.json({ documents: docs });
+  });
   router.post('/register',       controller.register);
   router.post('/login',          controller.login);
   router.post('/reset-password', controller.resetPassword);
@@ -15,6 +21,8 @@ module.exports = (models) => {
   // Protected
   router.use(adminAuth);
 
+  router.post('/requests/:id/documents', ...controller.uploadDocuments);
+  
   // Partners
   router.get   ('/partners',     controller.getAllPartners);
   router.get   ('/partners/:id', controller.getPartner);
@@ -25,6 +33,8 @@ module.exports = (models) => {
   router.get  ('/requests',            controller.getAllRequests);
   router.get  ('/requests/:id',        controller.getRequest);
   router.patch('/requests/:id/status', controller.updateRequestStatus);
+
+
 
   return router;
 };

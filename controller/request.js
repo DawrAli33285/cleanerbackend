@@ -41,7 +41,7 @@ const getRequest = async (req, res) => {
 
 
 
-const UPLOAD_DIR = path.join('/tmp/public/files/images');
+const UPLOAD_DIR = path.join('/tmp/public/files');
  
 // Ensure the upload directory exists at startup
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
