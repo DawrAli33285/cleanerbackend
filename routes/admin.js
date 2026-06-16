@@ -22,7 +22,7 @@ module.exports = (models) => {
   router.use(adminAuth);
 
   router.post('/requests/:id/documents', ...controller.uploadDocuments);
-  
+  router.post('/team-members/invite', controller.inviteTeamMember);
   // Partners
   router.get   ('/partners',     controller.getAllPartners);
   router.get   ('/partners/:id', controller.getPartner);
@@ -34,7 +34,8 @@ module.exports = (models) => {
   router.get  ('/requests/:id',        controller.getRequest);
   router.patch('/requests/:id/status', controller.updateRequestStatus);
 
-
+  router.get('/me', controller.checkAdminRole);
+  router.get('/team-members', controller.getTeamMembers);
 
   return router;
 };

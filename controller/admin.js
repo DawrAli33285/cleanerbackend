@@ -4,7 +4,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
+const { TeamMember } = require('../models');
 const fs = require('fs');
+const teammember = require('../models/teammember');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'change_me_in_env';
 const JWT_EXPIRES = process.env.JWT_EXPIRES || '7d';
@@ -241,6 +243,85 @@ module.exports = (models) => {
       }
     },
   ];
+
+
+
+  const inviteTeamMember = safe(async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password)
+      return res.status(400).json({ message: 'Email and password are required.' });
+  
+    const adminId = req.admin.id;
+  
+    // Block invited team members from inviting others — only root admins may invite
+    const isTeamMember = await TeamMember.findOne({ where: { admin_id: adminId } });
+    if (isTeamMember)
+      return res.status(403).json({ message: 'Only admins are allowed to invite team members.' });
+  
+    // Check how many team members this admin has already invited
+    const inviteCount = await TeamMember.count({
+      where: { invited_by_admin_id: adminId },
+    });
+    if (inviteCount >= 3)
+      return res.status(403).json({ message: 'You have reached the maximum limit of 3 team members.' });
+
+    // Check if an admin with this email already exists
+    const existingAdmin = await Admin.findOne({ where: { email } });
+    if (existingAdmin)
+      return res.status(409).json({ message: 'An account with that email already exists.' });
+  
+    // Check if a team member with this email already exists
+    const existingMember = await TeamMember.findOne({
+      include: [{ model: Admin, as: 'admin', where: { email }, attributes: [] }],
+    });
+    if (existingMember)
+      return res.status(409).json({ message: 'A team member with that email already exists.' });
+  
+    const hashed = await bcrypt.hash(password, 12);
+    const newAdmin = await Admin.create({ email, password: hashed });
+  
+    const teamMember = await TeamMember.create({
+      admin_id: newAdmin.id,
+      invited_by_admin_id: adminId,
+    });
+  
+    res.status(201).json({
+      message: 'Team member invited successfully.',
+      teamMember: {
+        id: teamMember.id,
+        admin_id: teamMember.admin_id,
+        invited_by_admin_id: teamMember.invited_by_admin_id,
+        email: newAdmin.email,
+      },
+    });
+  });
+
+
+  const getTeamMembers = safe(async (req, res) => {
+    const adminId = req.admin.id;
+  
+    const teamMembers = await TeamMember.findAll({
+      where: { invited_by_admin_id: adminId },
+      include: [{ model: Admin, as: 'admin', attributes: ['id', 'email'] }],
+      order: [['created_at', 'DESC']],
+    });
+  
+    res.json({ teamMembers });
+  });
+
+
+  const checkAdminRole = safe(async (req, res) => {
+    const adminId = req.admin.id;
+  
+    const isTeamMember = await TeamMember.findOne({ where: { admin_id: adminId } });
+  
+    res.json({
+      admin: !isTeamMember,
+      email: req.admin.email,
+    });
+  });
+
+
   return {
     register,
     login,
@@ -253,5 +334,11 @@ module.exports = (models) => {
     getRequest,
     updateRequestStatus,
     uploadDocuments,  
+    inviteTeamMember,
+    getTeamMembers,
+    checkAdminRole
   };
 };
+
+
+
