@@ -33,9 +33,13 @@ module.exports = (models) => {
   router.get  ('/requests',            controller.getAllRequests);
   router.get  ('/requests/:id',        controller.getRequest);
   router.patch('/requests/:id/status', controller.updateRequestStatus);
-
+router.patch('/requests/:id/price',controller.updateRequestPrice)
   router.get('/me', controller.checkAdminRole);
   router.get('/team-members', controller.getTeamMembers);
 
+
+  router.patch('/partner-team-members/:id/approve', controller.approvePartnerTeamMember);
+  router.patch('/partner-team-members/:id/deny',    controller.denyPartnerTeamMember);
+  router.get('/partner-team-members', controller.getAllPartnerTeamMembers);
   return router;
 };

@@ -33,7 +33,7 @@ const safe = (fn) => async (req, res) => {
 };
 
 module.exports = (models) => {
-  const { Admin, Partner, MemorialRequest, RequestPhoto } = models;
+  const { Admin, Partner, MemorialRequest, RequestPhoto, PartnerTeamMember } = models;
 
   // ── AUTH ──────────────────────────────────────────────────────────────────
 
@@ -203,6 +203,30 @@ module.exports = (models) => {
     });
   });
 
+
+  const updateRequestPrice = safe(async (req, res) => {
+    const { packagePrice } = req.body;
+  
+    const parsedPrice = parseFloat(packagePrice);
+    if (isNaN(parsedPrice) || parsedPrice < 0) {
+      return res.status(400).json({ message: 'Invalid price.' });
+    }
+  
+    const request = await MemorialRequest.findByPk(req.params.id);
+    if (!request) return res.status(404).json({ message: 'Request not found.' });
+  
+    request.packagePrice = parsedPrice;
+    await request.save();
+  
+    res.json({
+      message: 'Price updated.',
+      request: {
+        id: request.id,
+        packagePrice: request.packagePrice,
+      },
+    });
+  });
+
   // ── DOCUMENTS — must be an array, NOT wrapped in safe() ──────────────────
 
   const uploadDocuments = [
@@ -296,7 +320,65 @@ module.exports = (models) => {
     });
   });
 
-
+  const approvePartnerTeamMember = safe(async (req, res) => {
+    const adminId = req.admin.id;
+    const { id } = req.params;
+  
+    const member = await PartnerTeamMember.findByPk(id);
+    if (!member)
+      return res.status(404).json({ message: 'Team member not found.' });
+  
+    if (member.status === 'approved')
+      return res.status(409).json({ message: 'This team member is already approved.' });
+  
+    member.status = 'approved';
+    member.approved_by_admin_id = adminId;
+    member.approved_at = new Date();
+    await member.save();
+  
+    res.json({
+      message: 'Team member approved successfully.',
+      teamMember: {
+        id: member.id,
+        partner_id: member.partner_id,
+        invited_by_partner_id: member.invited_by_partner_id,
+        status: member.status,
+        approved_by_admin_id: member.approved_by_admin_id,
+        approved_at: member.approved_at,
+      },
+    });
+  });
+  
+  const denyPartnerTeamMember = safe(async (req, res) => {
+    const adminId = req.admin.id;
+    const { id } = req.params;
+  
+    const member = await PartnerTeamMember.findByPk(id);
+    if (!member)
+      return res.status(404).json({ message: 'Team member not found.' });
+  
+    if (member.status === 'denied')
+      return res.status(409).json({ message: 'This team member is already denied.' });
+  
+    member.status = 'denied';
+    member.approved_by_admin_id = adminId;
+    member.approved_at = new Date();
+    await member.save();
+  
+    res.json({
+      message: 'Team member denied successfully.',
+      teamMember: {
+        id: member.id,
+        partner_id: member.partner_id,
+        invited_by_partner_id: member.invited_by_partner_id,
+        status: member.status,
+        approved_by_admin_id: member.approved_by_admin_id,
+        approved_at: member.approved_at,
+      },
+    });
+  });
+  
+   
   const getTeamMembers = safe(async (req, res) => {
     const adminId = req.admin.id;
   
@@ -321,7 +403,19 @@ module.exports = (models) => {
     });
   });
 
+  const getAllPartnerTeamMembers = safe(async (req, res) => {
+    const partnerTeamMembers = await PartnerTeamMember.findAll({
+      include: [
+        { model: Partner, as: 'partner',          attributes: ['id', 'username', 'email'] },
+        { model: Partner, as: 'invitedByPartner', attributes: ['id', 'username', 'email'] },
+      ],
+      order: [['created_at', 'DESC']],
+    });
+    res.json({ partnerTeamMembers });
+  });
 
+
+  
   return {
     register,
     login,
@@ -336,8 +430,13 @@ module.exports = (models) => {
     uploadDocuments,  
     inviteTeamMember,
     getTeamMembers,
-    checkAdminRole
+    checkAdminRole,
+    updateRequestPrice,
+    approvePartnerTeamMember,
+    denyPartnerTeamMember,
+    getAllPartnerTeamMembers
   };
+
 };
 
 
