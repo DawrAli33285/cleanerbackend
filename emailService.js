@@ -61,11 +61,12 @@ const sendDailyReminderEmail = async (partnerEmail, partnerName, stats) => {
     </head>
     <body>
       <div class="container">
-        <div class="header">
-          <h1>Daily Partnership Update</h1>
-          <p>${partnerName}</p>
-          <p>${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-        </div>
+<div class="header">
+  <img src="https://res.cloudinary.com/dbjwbveqn/image/upload/v1782322278/ea262c67-909f-4213-ac77-e17bff68b659_l7nx6o.jpg" alt="Lasting Legacy Cleaners" style="height: 80px; width: auto; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto;" />
+  <h1>Daily Partnership Update</h1>
+  <p>${partnerName}</p>
+  <p>${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+</div>
         <div class="content">
           <div class="section">
             <div class="section-title">Annual Goal Progress</div>
@@ -86,14 +87,14 @@ const sendDailyReminderEmail = async (partnerEmail, partnerName, stats) => {
               <div class="revenue-card">
                 <div class="revenue-card-title">Basic Restoration</div>
                 <div class="revenue-item"><span class="revenue-item-label">Package Price:</span><span class="revenue-item-value">$549</span></div>
-                <div class="revenue-item"><span class="revenue-item-label">Per Sale:</span><span class="revenue-item-value">$100</span></div>
+                <div class="revenue-item"><span class="revenue-item-label">Partner Revenue:</span><span class="revenue-item-value">$100</span></div>
                 <div class="revenue-item"><span class="revenue-item-label">Sold:</span><span class="revenue-item-value">${basicCount}</span></div>
                 <div class="revenue-item"><span class="revenue-item-label">Revenue:</span><span class="revenue-item-value">$${basicRevenue.toFixed(2)}</span></div>
               </div>
               <div class="revenue-card">
                 <div class="revenue-card-title">Premium Restoration</div>
                 <div class="revenue-item"><span class="revenue-item-label">Package Price:</span><span class="revenue-item-value">$749</span></div>
-                <div class="revenue-item"><span class="revenue-item-label">Per Sale:</span><span class="revenue-item-value">$150</span></div>
+                <div class="revenue-item"><span class="revenue-item-label">Partner Revenue:</span><span class="revenue-item-value">$150</span></div>
                 <div class="revenue-item"><span class="revenue-item-label">Sold:</span><span class="revenue-item-value">${premiumCount}</span></div>
                 <div class="revenue-item"><span class="revenue-item-label">Revenue:</span><span class="revenue-item-value">$${premiumRevenue.toFixed(2)}</span></div>
               </div>
@@ -113,11 +114,12 @@ const sendDailyReminderEmail = async (partnerEmail, partnerName, stats) => {
           </div>
          
         </div>
-        <div class="footer">
-          <div class="footer-brand">Lasting Legacy Cleaners</div>
-          <div class="footer-tagline">Preserve The Legacy. Restore The Beauty.</div>
-          <p>317-970-3904</p>
-        </div>
+       <div class="footer">
+  <img src="https://lastinglegacycleaners.com/wp-content/uploads/2026/06/C0B6C462-9577-4FC4-B2A1-1D9DBB8DCE5F.png" alt="Lasting Legacy Cleaners" style="max-width: 200px; width: 100%; height: auto; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto;" />
+  <div class="footer-brand">Lasting Legacy Cleaners</div>
+  <div class="footer-tagline">Preserve The Legacy. Restore The Beauty.</div>
+  <p>317-970-3904</p>
+</div>
       </div>
     </body>
     </html>
