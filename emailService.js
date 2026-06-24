@@ -117,9 +117,16 @@ const sendDailyReminderEmail = async (partnerEmail, partnerName, stats) => {
        <div class="footer">
   <img src="https://lastinglegacycleaners.com/wp-content/uploads/2026/06/C0B6C462-9577-4FC4-B2A1-1D9DBB8DCE5F.png" alt="Lasting Legacy Cleaners" style="max-width: 200px; width: 100%; height: auto; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto;" />
   <a href="https://lastinglegacycleaners.com/app/" target="_blank" style="display: inline-block; padding: 12px 30px; background-color: #1e3c72; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 14px; margin-bottom: 20px;">Login to Dashboard →</a>
-  <div class="footer-brand">Lasting Legacy Cleaners</div>
+<div class="footer-brand">Lasting Legacy Cleaners</div>
   <div class="footer-tagline">Preserve The Legacy. Restore The Beauty.</div>
-  <p>317-970-3904</p>
+  <p>12175 Visionary Way, Fishers, IN 46038</p>
+  <p>Phone: 317.970.3904</p>
+ <p>Email: <a href="mailto:rsmith@lastinglegacycleaners.com" style="color: #1e3c72; text-decoration: none;">rsmith@lastinglegacycleaners.com</a></p>
+  <p style="margin-top: 12px;">
+    <a href="https://lastinglegacycleaners.com/terms-conditions/" target="_blank" style="color: #1e3c72; text-decoration: none; font-size: 12px;">Terms of Service</a>
+    <span style="color: #999; margin: 0 8px;">|</span>
+    <a href="https://lastinglegacycleaners.com/privacy-policy/" target="_blank" style="color: #1e3c72; text-decoration: none; font-size: 12px;">Privacy Policy</a>
+  </p>
 </div>
       </div>
     </body>
