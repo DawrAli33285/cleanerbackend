@@ -2,9 +2,11 @@
 
 const { Router } = require('express');
 const adminAuth = require('../middleware/admin');
-
+const partnershipSettingsController = require('../controller/partnershipSettingsController');
 const { MemorialRequest, RequestPhoto,Partner } = require('../models');
 module.exports = (models) => {
+  const { getSettings, updateSettings } = partnershipSettingsController(models);
+
   const router = Router();
   const controller = require('../controller/admin')(models); // ← pass models here
 
@@ -41,5 +43,9 @@ router.patch('/requests/:id/price',controller.updateRequestPrice)
   router.patch('/partner-team-members/:id/approve', controller.approvePartnerTeamMember);
   router.patch('/partner-team-members/:id/deny',    controller.denyPartnerTeamMember);
   router.get('/partner-team-members', controller.getAllPartnerTeamMembers);
+  
+  router.get('/partners/:id/settings', getSettings);
+  router.patch('/partners/:id/settings', updateSettings);
+
   return router;
 };
