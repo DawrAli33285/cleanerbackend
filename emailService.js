@@ -25,9 +25,9 @@ const sendDailyReminderEmail = async (partnerEmail, partnerName, stats) => {
       <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 30px 20px; text-align: center; }
-        .header h1 { margin: 0 0 10px 0; font-size: 24px; font-weight: 600; }
-        .header p { margin: 5px 0; font-size: 14px; opacity: 0.9; }
+.header { background: #ffffff; color: #1e3c72; padding: 30px 20px; text-align: center; border-bottom: 1px solid #e0e0e0; }
+.header h1 { margin: 0 0 10px 0; font-size: 24px; font-weight: 600; }
+.header p { margin: 5px 0; font-size: 14px; opacity: 0.9; color: #666; }
         .content { padding: 30px 20px; }
         .section { margin-bottom: 25px; }
         .section-title { font-size: 16px; font-weight: 600; color: #1e3c72; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
