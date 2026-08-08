@@ -7,6 +7,29 @@ const { calculatePartnerStats } = require('./partnerStatsService');
 
 let cronJob = null;
 
+const getRecipientEmails = async () => {
+  const admins = await Admin.findAll({
+    where: { emailRemindersEnabled: true },
+    attributes: ['email'],
+  });
+
+  const teamMembers = await TeamMember.findAll({
+    include: {
+      association: 'admin',
+      attributes: ['email'],
+      where: { emailRemindersEnabled: true },
+      required: true,
+    },
+  });
+
+  return [
+    ...new Set([
+      ...admins.map((a) => a.email),
+      ...teamMembers.map((t) => t.admin?.email).filter(Boolean),
+    ]),
+  ];
+};
+
 const sendDailyReminders = async () => {
   console.log(`[${new Date().toISOString()}] Starting daily reminder job...`);
 
@@ -26,21 +49,9 @@ const sendDailyReminders = async () => {
       return;
     }
 
-    const admins = await Admin.findAll({ attributes: ['email'] });
-
-    const teamMembers = await TeamMember.findAll({
-      include: { association: 'admin', attributes: ['email'] },
-    });
-
-    const recipientEmails = [
-      ...new Set([
-        ...admins.map((a) => a.email),
-        ...teamMembers.map((t) => t.admin?.email).filter(Boolean),
-      ]),
-    ];
+    const recipientEmails = await getRecipientEmails();
 
     console.log(`Sending to ${recipientEmails.length} recipients:`, recipientEmails);
-
     for (const partner of partnersWithSettings) {
       try {
         const stats = await calculatePartnerStats(partner.id);
@@ -95,17 +106,7 @@ const triggerReminderNow = async (partnerId = null) => {
 
       const stats = await calculatePartnerStats(partnerId);
 
-      const admins = await Admin.findAll({ attributes: ['email'] });
-      const teamMembers = await TeamMember.findAll({
-        include: { association: 'admin', attributes: ['email'] },
-      });
-
-      const recipientEmails = [
-        ...new Set([
-          ...admins.map((a) => a.email),
-          ...teamMembers.map((t) => t.admin?.email).filter(Boolean),
-        ]),
-      ];
+      const recipientEmails = await getRecipientEmails();
 
       for (const email of recipientEmails) {
         await sendDailyReminderEmail(email, stats.partnerName, stats);

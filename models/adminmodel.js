@@ -9,6 +9,12 @@ module.exports = (sequelize) => {
       autoIncrement: true,
       primaryKey: true,
     },
+    emailRemindersEnabled: {
+        type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: true,
+            field: 'email_reminders_enabled',
+          },
     email: {
       type: DataTypes.STRING,
       allowNull: false,

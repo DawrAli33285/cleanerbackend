@@ -3,7 +3,7 @@
 const { Router } = require('express');
 const adminAuth = require('../middleware/admin');
 const partnershipSettingsController = require('../controller/partnershipSettingsController');
-const { MemorialRequest, RequestPhoto,Partner } = require('../models');
+const { MemorialRequest, RequestPhoto,Partner, Admin } = require('../models');
 module.exports = (models) => {
   const { getSettings, updateSettings } = partnershipSettingsController(models);
 
@@ -19,6 +19,18 @@ module.exports = (models) => {
   router.post('/register',       controller.register);
   router.post('/login',          controller.login);
   router.post('/reset-password', controller.resetPassword);
+
+  router.patch('/settings/email-reminders', async (req, res) => {
+    const { enabled } = req.body;
+    if (typeof enabled !== 'boolean') {
+      return res.status(400).json({ message: 'enabled must be a boolean' });
+    }
+    await Admin.update(
+      { emailRemindersEnabled: enabled },
+      { where: { id: req.admin.id } }
+    );
+    res.json({ emailRemindersEnabled: enabled });
+  });
 
   // Protected
   router.use(adminAuth);
