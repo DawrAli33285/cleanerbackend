@@ -3,7 +3,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
-const { Partner, PartnerTeamMember } = require('../models');
+const { Partner, PartnerTeamMember, PartnershipSettings } = require('../models');
 const JWT_SECRET = process.env.JWT_SECRET;
 // REGISTER
 const register = async (req, res) => {
@@ -21,7 +21,6 @@ const register = async (req, res) => {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-
     const partner = await Partner.create({
       username: email,
       email,
@@ -32,10 +31,16 @@ const register = async (req, res) => {
       phone,
     });
 
+    await PartnershipSettings.create({
+      partnerId: partner.id,
+      emailRemindersEnabled: true,
+    });
+
     return res.status(201).json({
       message: 'Account created successfully.',
       partner: { id: partner.id, username: partner.username, role: partner.role },
     });
+
   } catch (err) {
     console.log(err.message)
     return res.status(500).json({ message: 'Server error.', error: err.message });
@@ -167,13 +172,19 @@ const resetPassword = async (req, res) => {
     });
     if (existingMember)
       return res.status(409).json({ message: 'A team member with that email already exists.' });
-  
     const hashed = await bcrypt.hash(password, 12);
     const newPartner = await Partner.create({ username: email, email, password: hashed });
+
+    await PartnershipSettings.create({
+      partnerId: newPartner.id,
+      emailRemindersEnabled: true,
+    });
+
     const partnerTeamMember = await PartnerTeamMember.create({
       partner_id: newPartner.id,
       invited_by_partner_id: partnerId,
     });
+    
   
     res.status(201).json({
       message: 'Team member invited successfully. Pending admin approval.',

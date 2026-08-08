@@ -14,15 +14,16 @@ sequelize.authenticate()
   .then(() => console.log('MySQL connected.'))
   .catch((err) => console.error('Connection failed:', err));
 
-const { initializeDailyReminderJob, triggerReminderNow } = require('./dailyReminderJob');
+
+const { initializeDailyReminderJob } = require('./dailyReminderJob');
 
 sequelize.sync({ force: false })
   .then(async () => {
     console.log('Tables synced.');
     initializeDailyReminderJob();
-    await triggerReminderNow(1); 
   })
   .catch((err) => console.error('Sync failed:', err));
+
 const authRoutes    = require('./routes/auth');
 const requestRoutes = require('./routes/request');
 const adminRoutes   = require('./routes/admin');

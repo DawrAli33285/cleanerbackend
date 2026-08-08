@@ -98,9 +98,16 @@ const triggerReminderNow = async (partnerId = null) => {
 
   if (partnerId) {
     try {
-      const partner = await Partner.findByPk(partnerId);
+      const partner = await Partner.findByPk(partnerId, {
+        include: { association: 'partnershipSettings' },
+      });
       if (!partner) {
         console.error(`Partner ${partnerId} not found`);
+        return;
+      }
+
+      if (partner.partnershipSettings && partner.partnershipSettings.emailRemindersEnabled === false) {
+        console.log(`Partner ${partnerId} has email reminders disabled — skipping.`);
         return;
       }
 

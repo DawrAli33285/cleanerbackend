@@ -33,8 +33,7 @@ const safe = (fn) => async (req, res) => {
 };
 
 module.exports = (models) => {
-  const { Admin, Partner, MemorialRequest, RequestPhoto, PartnerTeamMember } = models;
-
+  const { Admin, Partner, MemorialRequest, RequestPhoto, PartnerTeamMember, PartnershipSettings } = models;
   // ── AUTH ──────────────────────────────────────────────────────────────────
 
   const register = safe(async (req, res) => {
@@ -91,10 +90,16 @@ module.exports = (models) => {
   const getAllPartners = safe(async (req, res) => {
     const partners = await Partner.findAll({
       attributes: ['id', 'username', 'email', 'role', 'createdAt', 'updatedAt'],
+      include: [{
+        model: PartnershipSettings,
+        as: 'partnershipSettings',
+        attributes: ['emailRemindersEnabled'],
+      }],
       order: [['created_at', 'DESC']],
     });
     res.json({ partners });
   });
+
 
   const getPartner = safe(async (req, res) => {
     const partner = await Partner.findByPk(req.params.id, {
