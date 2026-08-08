@@ -20,6 +20,10 @@ module.exports = (models) => {
   router.post('/login',          controller.login);
   router.post('/reset-password', controller.resetPassword);
 
+  // Protected
+  router.use(adminAuth);
+
+  
   router.patch('/settings/email-reminders', async (req, res) => {
     const { enabled } = req.body;
     if (typeof enabled !== 'boolean') {
@@ -31,9 +35,6 @@ module.exports = (models) => {
     );
     res.json({ emailRemindersEnabled: enabled });
   });
-
-  // Protected
-  router.use(adminAuth);
 
   router.post('/requests/:id/documents', ...controller.uploadDocuments);
   router.post('/team-members/invite', controller.inviteTeamMember);
