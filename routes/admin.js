@@ -36,6 +36,12 @@ module.exports = (models) => {
     res.json({ emailRemindersEnabled: enabled });
   });
 
+  router.get('/settings/email-reminders', async (req, res) => {
+    const admin = await Admin.findByPk(req.admin.id);
+    if (!admin) return res.status(404).json({ message: 'Admin not found' });
+    res.json({ emailRemindersEnabled: admin.emailRemindersEnabled });
+  });
+
   router.post('/requests/:id/documents', ...controller.uploadDocuments);
   router.post('/team-members/invite', controller.inviteTeamMember);
   // Partners
