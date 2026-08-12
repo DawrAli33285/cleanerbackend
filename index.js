@@ -27,9 +27,11 @@ sequelize.sync({ force: false })
 const authRoutes    = require('./routes/auth');
 const requestRoutes = require('./routes/request');
 const adminRoutes   = require('./routes/admin');
+const billingRoutes = require('./routes/billing');
 
 app.use('/api', authRoutes);
 app.use('/api', requestRoutes);
+app.use('/api', billingRoutes);
 app.use('/api/admin', adminRoutes(models));
 
 // Test route to manually trigger reminder
